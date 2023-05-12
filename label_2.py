@@ -176,3 +176,175 @@ class Annotator:
 
         for item in selected_items:
             self.tree.insert(item, "end", flag_name, text=flag_name)
+            
+       def select_image(self):
+        self.directory = askdirectory()
+        self.image_files = [
+            f
+            for f in os.listdir(self.directory)
+            if f.endswith(".jpg") or f.endswith(".jpeg") or f.endswith(".png")
+        ]
+        self.file_index = 0
+        self.filepath = os.path.join(self.directory, self.image_files[self.file_index])
+        self.image_label.config(
+            text="Image selected: " + os.path.basename(self.filepath)
+        )
+        self.next_button.config(state="normal")
+        self.annotate_button.config(state="normal")
+        self.save_button.config(state="disabled")
+        self.var.set(0)
+        if len(self.image_files) > 1:
+            self.back_button.config(state="normal")
+
+        self.load_annotation()
+    
+    def load_annotation(self):
+        annotations = {}
+        try:
+            with open("annotations.json", "r", encoding="utf-8") as f:
+                annotations = json.load(f)
+        except FileNotFoundError:
+            pass
+
+        filename = self.image_files[self.file_index]
+
+        if filename in annotations:
+            annotation_data = annotations[filename]
+            if "labels" in annotation_data:
+                labels = annotation_data["labels"]
+                if "label" in labels:
+                    self.var.set(labels["label"])
+            if "flags" in annotation_data:
+                flags = annotation_data["flags"]
+                for flag in flags:
+                    item = self.tree.selection()[0]
+                    self.tree.selection_remove(item)
+                    self.tree.selection_add(flag)
+        else:
+            self.var.set(None)
+            selected_items = self.tree.selection()
+            for item in selected_items:
+                self.tree.selection_remove(item)
+
+    def back_image(self):
+        if self.file_index == 0:
+            messagebox.showinfo("No more images", "This is the first image.")
+            self.back_button.config(state="disabled")
+            return
+        self.file_index -= 1
+        self.filepath = os.path.join(self.directory, self.image_files[self.file_index])
+        self.image_label.config(text="Image selected: "
+                                + os.path.basename(self.filepath))
+        self.next_button.config(state="normal")
+        self.annotate_button.config(state="normal")
+        self.save_button.config(state="disabled")
+        self.var.set(0)
+        selected_items = self.tree.selection()
+        for item in selected_items:
+            self.tree.selection_remove(item)
+        self.load_annotation() 
+    def annotate_image(self):
+        self.save_button.config(state="normal")
+        with Image.open(self.filepath) as image:
+            image.show()
+        self.save_button.config(state="normal")
+
+    def next_image(self):
+        self.file_index += 1
+        if self.file_index >= len(self.image_files):
+            messagebox.showinfo(
+                "No more images", "There are no more images in this folder."
+            )
+            self.next_button.config(state="disabled")
+            return
+        self.filepath = os.path.join(self.directory, self.image_files[self.file_index])
+        self.image_label.config(text="Image selected: "
+                                 + os.path.basename(self.filepath))
+        self.annotate_button.config(state="normal")
+        self.save_button.config(state="disabled")
+        self.var.set(0)
+        selected_items = self.tree.selection()
+        for item in selected_items:
+            self.tree.selection_remove(item)
+        self.load_annotation()
+    def save_annotation(self):
+        annotations = {}
+        annotations["labels"] = {}
+        annotations["flags"] = {}
+        filename = self.image_files[self.file_index]
+
+        flags = []
+        selected_items = self.tree.selection()
+        for item in selected_items:
+            item_text = get_complete_text(self.tree, item)
+            flags.append(item_text)
+
+        annotations["flags"] = flags
+
+        if self.var.get() in ["Positive", "Negative"]:
+            annotations["labels"]["label"] = self.var.get()
+        else:
+            messagebox.showerror("Error", "Please select a class before saving.")
+            return
+
+        try:
+            with open("annotations.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except:
+            data = {}
+
+        if filename not in data:
+            data[filename] = {}
+        data[filename].update(annotations)
+
+        with open("annotations.json", "w", encoding="utf-8") as f:
+            f.write(json.dumps(data, indent=4, ensure_ascii=False))
+
+        messagebox.showinfo(
+            "Annotations Saved!", "Annotations have been saved to the disk."
+        )
+        self.save_button.config(state="disabled")
+    
+    def show_image_info(self):
+        selected_items = self.tree.selection()
+        if not selected_items:
+            messagebox.showinfo("No Selection", "Please select an image in the tree.")
+            return
+
+        image_name = self.tree.item(selected_items[0], "text")
+        messagebox.showinfo("Image Info", f"Selected Image: {image_name}")
+    
+    def delete_annotation(self):
+        selected_items = self.tree.selection()
+        if not selected_items:
+            messagebox.showinfo("No Selection", "Please select an item to delete.")
+            return
+
+        item = selected_items[0]
+        self.tree.delete(item)
+
+    def clear_annotations(self):
+        self.tree.delete(*self.tree.get_children())
+    
+    def export_annotations(self):
+        selected_items = self.tree.selection()
+        if not selected_items:
+            messagebox.showinfo("No Selection", "Please select items to export.")
+            return
+
+        export_data = []
+        for item in selected_items:
+            item_text = self.tree.item(item, "text")
+            export_data.append(item_text)
+
+        export_filename = "annotations.txt"
+        with open(export_filename, "w") as f:
+            f.write("\n".join(export_data))
+
+        messagebox.showinfo(
+            "Export Successful",
+            f"The selected annotations have been exported to {export_filename}.",
+        )
+root = Tk()
+my_gui = Annotator(root)
+root.mainloop()
