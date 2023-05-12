@@ -1,0 +1,124 @@
+import os
+from tkinter import (
+    Tk,
+    Label,
+    Button,
+    Frame,
+    LabelFrame,
+    StringVar,
+    Radiobutton,
+)
+from tkinter.filedialog import askdirectory
+from tkinter import ttk
+from tkinter import simpledialog
+
+import json
+from PIL import Image
+
+
+hierarchy = [
+    {"name": "Foo", "children": [
+        {"name": "Bar", "children": [
+            {"name": "foo_bar_1"},
+            {"name": "foo_bar_2"}
+        ]}
+    ]}
+]
+
+
+def get_complete_text(tree, item):
+    item_text = tree.item(item, "text")
+    parent = tree.parent(item)
+    if parent:
+        item_text = f"{get_complete_text(tree, parent)}/{item_text}"
+    return item_text
+
+
+class Annotator:
+    def __init__(self, master):
+        self.master = master
+        master.title("Annotator Studio")
+        master.geometry("800x600")
+        master.configure(bg="#e6f2e8")  # Set background color
+
+        self.controls = LabelFrame(
+            master,
+            text="Controls",
+            padx=10,
+            pady=10,
+            bg="#b3e6cc",  # Set background color
+            relief="solid",
+            borderwidth=1,
+        )
+        self.controls.pack(padx=15, fill="x")
+        self.select_button = Button(
+            self.controls,
+            text="Select Image",
+            command=self.select_image,
+            bg="#70af85",  # Set background color
+            fg="white",
+            font=("Arial", 12),
+            relief="raised",
+            width=15,
+        )
+        self.select_button.pack(side="left", padx=5)
+        self.back_button = Button(
+            self.controls,
+            text="Previous",
+            command=self.back_image,
+            state="disabled",
+            bg="#70af85",  # Set background color
+            fg="white",
+            font=("Arial", 12),
+            relief="raised",
+            width=10,
+        )
+        self.back_button.pack(side="left", padx=5)
+        self.next_button = Button(
+            self.controls,
+            text="Next",
+            command=self.next_image,
+            state="disabled",
+            bg="#70af85",  # Set background color
+            fg="white",
+            font=("Arial", 12),
+            relief="raised",
+            width=10,
+        )
+        self.next_button.pack(side="left", padx=5)
+        self.annotate_button = Button(
+            self.controls,
+            text="Annotate",
+            command=self.annotate_image,
+            state="disabled",
+            bg="#70af85",  # Set background color
+            fg="white",
+            font=("Arial", 12),
+            relief="raised",
+            width=10,
+        )
+        self.annotate_button.pack(side="left", padx=5)
+        self.save_button = Button(
+            self.controls,
+            text="Save",
+            command=self.save_annotation,
+            state="disabled",
+            bg="#70af85",  # Set background color
+            fg="white",
+            font=("Arial", 12),
+            relief="raised",
+            width=10,
+        )
+        self.save_button.pack(side="left", padx=5)
+
+        self.image = LabelFrame(
+            master,
+            text="Image",
+            padx=10,
+            pady=10,
+            bg="#b3e6cc",  # Set background color
+            relief="solid",
+            borderwidth=1,
+        )
+        self.image.pack(padx=15, fill="x")
+       
