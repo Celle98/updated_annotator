@@ -16,7 +16,14 @@ import json
 from PIL import Image
 
 
-hierarchy = {"Foo": {"Bar": {"foo_bar_1": None, "foo_bar_2": None}}}
+hierarchy = [
+    {"name": "Foo", "children": [
+        {"name": "Bar", "children": [
+            {"name": "foo_bar_1"},
+            {"name": "foo_bar_2"}
+        ]}
+    ]}
+]
 
 
 def get_complete_text(tree, item):
@@ -132,20 +139,15 @@ class Annotator:
         # Rest of the code remains unchanged
 
 
-      def add_node(k, v):
-            for i, j in v.items():
-                self.tree.insert(k, 1, i, text=i)
-                if isinstance(j, dict):
-                    add_node(i, j)
-
-        for k, v in hierarchy.items():
-            self.tree.insert("", 1, k, text=k)
-            add_node(k, v)
-
-        self.tree.pack(expand=True, fill="both")
-
-        self.image_files = []
-        self.file_index = 0
+     def add_node(self, parent, items):
+        for item in items:
+            item_name = item["name"]
+            item_children = item.get("children", [])
+            
+            self.tree.insert(parent, "end", item_name, text=item_name)
+            
+            if item_children:
+                self.add_node(item_name, item_children)
 
     def select_image(self):
         self.directory = askdirectory()
