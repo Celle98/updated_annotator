@@ -128,15 +128,42 @@ class Annotator:
         positive_button.pack(side="left", padx=5)
         negative_button.pack(side="left", padx=5)
 
-        self.flags_label = ttk.Label(master, 
-                                     text="Flags", font=("Arial", 12),
-                                     background="white")
+        self.flags_label = ttk.Label(master, text="Flags", font=("Arial", 12), background="white")
         self.flags_label.pack()
-        self.tree = ttk.Treeview(master, 
-                                 show="tree", selectmode="extended",
-                                 style="Custom.Treeview")
 
-        # Rest of the code remains unchanged
+        self.tree = ttk.Treeview(master, show="tree", selectmode="extended", style="Custom.Treeview")
+        self.tree.pack()
+
+        self.add_node("", hierarchy)
+
+        self.add_flag_button = Button(
+            master,
+            text="Add Flag",
+            command=self.add_flag,
+            state="disabled",
+            bg="lightgray",
+            fg="black",
+            font=("Arial", 12),
+            relief="raised",
+            width=10,
+            )
+            self.add_flag_button.pack(pady=10)
+
+# Existing code...
+
+def add_flag(self):
+    selected_items = self.tree.selection()
+    if not selected_items:
+        messagebox.showinfo("No Selection", "Please select an item in the tree.")
+        return
+
+    flag_name = messagebox.askstring("Flag Name", "Enter the name for the flag:")
+    if flag_name:
+        parent_item = selected_items[0]
+        self.tree.insert(parent_item, "end", flag_name, text=flag_name)
+
+# Existing code...
+
 
 
      def add_node(self, parent, items):
