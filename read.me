@@ -1,0 +1,70 @@
+Annotator Studio Documentation
+Annotator Studio is a GUI tool for annotating images with labels and flags. It provides a user-friendly interface for selecting and annotating images, organizing annotations using a hierarchical tree structure, and exporting annotations.
+
+Table of Contents
+Installation
+Usage
+Features
+Functions
+Example
+Contributing
+License
+Installation
+To use the Annotator Studio tool, follow these steps:
+
+Ensure you have Python installed on your system.
+Clone the repository or download the source code files.
+Install the required dependencies using pip:
+shell
+Copy code
+pip install pillow
+Run the script annotator.py to launch the application.
+Usage
+Upon running the Annotator Studio tool, a graphical user interface (GUI) window will open, providing various controls and features for image annotation. The main components of the GUI include:
+
+Controls: This section contains buttons for selecting, navigating, annotating, and saving images.
+Image: This section displays the currently selected image for annotation.
+Labels: This section allows the user to select the label (positive or negative) for the current annotation.
+Flags: This section presents a hierarchical tree structure for organizing flags. The user can select one or more flags to associate with the current annotation.
+To annotate images using the tool, follow these steps:
+
+Click the "Select" button to choose a directory containing the images for annotation.
+Once a directory is selected, the tool will display the first image in the directory. Use the "Next" and "Back" buttons to navigate through the images.
+Click the "Annotate" button to open the image in an external image viewer for annotation.
+After annotating the image, return to the tool and click the "Save" button to save the annotation.
+Use the "Next" and "Back" buttons to move to the next or previous image and repeat the annotation process.
+Select appropriate labels (positive or negative) and flags for each annotation as desired.
+To export the selected annotations, use the "Export" button to save them to a text file.
+Features
+The Annotator Studio tool provides the following features:
+
+Image selection and navigation: Select a directory containing images and navigate through them using the "Next" and "Back" buttons.
+Image annotation: Open selected images in an external image viewer for annotation.
+Labeling: Assign labels (positive or negative) to annotations using radio buttons.
+Flag hierarchy: Organize annotations using a hierarchical tree structure of flags.
+Annotation saving: Save annotations to a JSON file.
+Export annotations: Export selected annotations to a text file.
+Functions
+The Annotator Studio tool provides the following functions:
+
+select_image(): Open a directory dialog to choose a directory containing images for annotation.
+back_image(): Move to the previous image in the selected directory.
+annotate_image(): Open the selected image in an external image viewer for annotation.
+next_image(): Move to the next image in the selected directory.
+save_annotation(): Save the current annotation to a JSON file.
+export_annotations(): Export selected annotations to a text file.
+Example
+python
+Copy code
+import os
+from tkinter import (
+    Tk,
+    Label,
+    Button,
+    Frame,
+    LabelFrame,
+    messagebox,
+    StringVar,
+    Radiobutton,
+)
+from tkinter.filedialog import askdirectory
